@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     localStorage.setItem("token", result.access_token);
                     localStorage.setItem("userEmail", email);
                     alert("Login successful!");
-                    window.location.href = "frontend/dashboard.html"; // Redirect to dashboard
+                    window.location.href = "dashboard.html"; // Redirect to dashboard
                 } else {
                     alert("Invalid email or password");
                 }
