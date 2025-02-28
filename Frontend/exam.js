@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  
              if (response.ok) {
                  alert(result.message);
-                 window.location.href = "frontend/dashboard.html"; // Redirect after submission
+                 window.location.href = "dashboard.html"; // Redirect after submission
              } else {
                  alert("Error submitting exam: " + result.detail);
              }
