@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    image: mayur702/apptitude-web-application:backend
+    container_name: backend-container
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  frontend:
+    image: my-frontend-app:latest
+    container_name: frontend-container
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_BACKEND_URL=http://backend-container:8000  # Connect frontend to backend
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
