@@ -1,5 +1,5 @@
 
-const BASE_URL = "https://new-web-vamn.onrender.com";
+const BASE_URL = "http://my-backend-lb-963343963.us-east-1.elb.amazonaws.com";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // const BASE_URL = "http://192.168.39.174:8000"; // Update with your API URL

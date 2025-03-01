@@ -1,4 +1,4 @@
-const BASE_URL = "https://new-web-vamn.onrender.com";
+const BASE_URL = "http://my-backend-lb-963343963.us-east-1.elb.amazonaws.com";
 
 document.addEventListener("DOMContentLoaded", function () {
     const getResultButton = document.getElementById("getResult");
