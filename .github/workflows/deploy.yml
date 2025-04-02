@@ -35,7 +35,7 @@ jobs:
           ECR_REPOSITORY: apptitude-frontend
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./Frontend
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
@@ -46,7 +46,7 @@ jobs:
           ECR_REPOSITORY: apptitude-backend
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./Backend
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
@@ -57,7 +57,9 @@ jobs:
         run: |
           TASK_ARNs=$(aws ecs list-tasks --cluster $CLUSTER_NAME --query "taskArns" --output text)
           if [ -n "$TASK_ARNs" ]; then
-            aws ecs stop-task --cluster $CLUSTER_NAME --task $TASK_ARNs
+            for TASK_ARN in $TASK_ARNs; do
+              aws ecs stop-task --cluster $CLUSTER_NAME --task $TASK_ARN
+            done
           fi
 
       - name: Deploy Frontend and Backend to Amazon ECS
@@ -65,10 +67,6 @@ jobs:
           CLUSTER_NAME: apptitude-cluster
           FRONTEND_SERVICE_NAME: apptitude-frontend-service
           BACKEND_SERVICE_NAME: apptitude-backend-service
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPOSITORY: apptitude-frontend
-          BACKEND_REPOSITORY: apptitude-backend
-          IMAGE_TAG: latest
         run: |
           aws ecs update-service --cluster $CLUSTER_NAME --service $FRONTEND_SERVICE_NAME --force-new-deployment
           aws ecs update-service --cluster $CLUSTER_NAME --service $BACKEND_SERVICE_NAME --force-new-deployment
