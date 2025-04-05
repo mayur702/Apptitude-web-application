@@ -11,7 +11,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,7 +20,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2  # Change to your AWS region
+          aws-region: us-east-2
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -53,22 +52,21 @@ jobs:
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Stop Old ECS Tasks
-        env:
-          CLUSTER_NAME: apptitude-cluster
-        run: |
-          TASK_ARNs=$(aws ecs list-tasks --cluster $CLUSTER_NAME --query "taskArns" --output text)
-          if [ -n "$TASK_ARNs" ]; then
-            for TASK_ARN in $TASK_ARNs; do
-              aws ecs stop-task --cluster $CLUSTER_NAME --task $TASK_ARN
-            done
-          fi
-
-      - name: Deploy Frontend and Backend to Amazon ECS
+      - name: Force ECS Deployment for Both Services
         env:
           CLUSTER_NAME: apptitude-cluster
           FRONTEND_SERVICE_NAME: apptitude-frontend-service
           BACKEND_SERVICE_NAME: apptitude-backend-service
         run: |
+          echo "Triggering ECS deployments with new task definitions..."
           aws ecs update-service --cluster $CLUSTER_NAME --service $FRONTEND_SERVICE_NAME --force-new-deployment
           aws ecs update-service --cluster $CLUSTER_NAME --service $BACKEND_SERVICE_NAME --force-new-deployment
+
+      - name: Wait for services to stabilize (optional)
+        env:
+          CLUSTER_NAME: apptitude-cluster
+          FRONTEND_SERVICE_NAME: apptitude-frontend-service
+          BACKEND_SERVICE_NAME: apptitude-backend-service
+        run: |
+          aws ecs wait services-stable --cluster $CLUSTER_NAME --services $FRONTEND_SERVICE_NAME
+          aws ecs wait services-stable --cluster $CLUSTER_NAME --services $BACKEND_SERVICE_NAME
