@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    name: Terraform redploy
+    name: Terraform Deploy
     runs-on: self-hosted
 
     defaults:
