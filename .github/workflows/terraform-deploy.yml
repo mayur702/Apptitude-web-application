@@ -1,0 +1,39 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches:
+      - prod
+    paths:
+      - 'Terraform/**'
+      - '.github/workflows/terraform-deploy.yml'
+
+jobs:
+  terraform:
+    name: Terraform Deploy
+    runs-on: self-hosted
+
+    defaults:
+      run:
+        working-directory: Terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
