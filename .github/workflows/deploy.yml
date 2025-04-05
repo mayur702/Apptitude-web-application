@@ -1,14 +1,16 @@
-name: Deploy Frontend and Backend to AWS ECS
+name: CI/CD Deploy
 
 on:
-  push:
-    branches:
-      - prod  # Trigger workflow on prod branch
+  workflow_run:
+    workflows: ["Terraform Deploy"]
+    types:
+      - completed
 
 jobs:
   deploy:
-    name: Deploy Frontend and Backend to Amazon ECS
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+
 
     steps:
       - name: Checkout repository
